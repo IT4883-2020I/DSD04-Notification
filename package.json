@@ -1,0 +1,27 @@
+{
+  "name": "dsd04-notification",
+  "version": "1.0.0",
+  "description": "DSD04-notification",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IT4883-2020I/DSD04-Notification.git"
+  },
+  "author": "DSD04-20201",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/IT4883-2020I/DSD04-Notification/issues"
+  },
+  "homepage": "https://github.com/IT4883-2020I/DSD04-Notification#readme",
+  "dependencies": {
+    "config": "^3.3.2",
+    "express": "^4.17.1",
+    "mongoose": "^5.10.15",
+    "nodemon": "^2.0.6"
+  }
+}
