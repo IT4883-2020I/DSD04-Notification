@@ -1,6 +1,6 @@
+require('dotenv').config()
 const express = require('express');
 const mongoose = require('mongoose');
-const config = require('config');
 
 const app = express();
 
@@ -8,9 +8,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 
-// database
-const mongoURI = config.get("mongoURI");
-mongoose.connect(mongoURI,
+mongoose.connect(process.env.mongoURI,
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
