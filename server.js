@@ -19,7 +19,7 @@ mongoose.connect(process.env.mongoURI,
 
 // routes
 app.use("/", require('./routes/test'));
-
+app.use("/", require('./routes/notification'));
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`App is running on port ${port}`));
