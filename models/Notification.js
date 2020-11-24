@@ -52,12 +52,15 @@ const NotificationSchema = new mongoose.Schema(
       2: payload, 
       3: User,
       4: Image/ video,
-      5: sự cố,
-      6: đối tượng giám sát,
-      7: Báo cáo thống kê
-      8: Miền giám sát
-      9: công việc xử lý sự cố
-      10: flight hub
+      5: đối tượng giám sát,
+      6: Báo cáo thống kê,
+      7: Miền giám sát,
+      8: công việc xử lý sự cố,
+      9: flight hub,
+      10: sự cố lưới điện,
+      11: sự cố cây trồng,
+      12: sự cố cháy rừng,
+      13: sự cố đê điều
       */
       _link: {
         type: String,
