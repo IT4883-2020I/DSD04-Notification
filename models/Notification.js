@@ -3,11 +3,20 @@ const mongoose = require('mongoose');
 const NotificationSchema = new mongoose.Schema(
   {
     fromUser: {
-      _id: String,
-      username: String
+      _id: {
+        type: String,
+        required: true
+      },
+      username: {
+        type: String,
+        required: true
+      }
     },
     toUser: [{
-      _id: String,
+      _id: {
+        type: String,
+        required: true
+      },
       isSeen: { // người dùng đã xem thông báo hay chưa
         type: Boolean,
         default: false
@@ -19,19 +28,25 @@ const NotificationSchema = new mongoose.Schema(
     }],
     content: { // nội dung thông báo
       type: String,
-      require: true
+      required: true
     },
     level: { // cấp độ thông báo 1-5
       type: Number,
-      require: true
+      required: true
     },
     createdAt: { // thời gian tạo thông báo
       type: Date,
       default: Date.now
     },
     ref: { // đối tượng thông báo nói đến
-      _id: String, 
-      _type: Number, 
+      _id: {
+        type: String,
+        required: true
+      }, 
+      _type: {
+        type: Number,
+        required: true
+      }, 
       /*loại đối tượng : 
       1: drone,
       2: payload, 
@@ -44,7 +59,10 @@ const NotificationSchema = new mongoose.Schema(
       9: công việc xử lý sự cố
       10: flight hub
       */
-      _link: String
+      _link: {
+        type: String,
+        required: true
+      }
     }
   }
 
