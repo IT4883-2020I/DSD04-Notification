@@ -4,26 +4,9 @@ const Ntf = require('../models/Notification');
 const FollowRef = require('../models/followRef');
 const verifyToken = require('../utils/verifyToken');
 const router = express.Router();
-
+const resCode = require('../utils/resCode');
 var axios = require('axios');
-var resCode = {
-  OK: {
-    code: 1000,
-    message: "OK"
-  },
-  UNKNOWN_ERROR: {
-    code: 1005,
-    message: "UNKNOWN ERROR"
-  },
-  BAD_REQUEST:{
-    code: 1001, 
-    message: "BAD REQUEST"
-  },
-  NOT_FOUND:{
-    code: 1002,
-    message: "NOT FOUND"
-  }
-}
+
 
 // Create new Ntf
 router.post('/create_ntf', async (req, res) => {
