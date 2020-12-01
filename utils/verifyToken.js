@@ -1,5 +1,5 @@
 var axios = require('axios');
-const resCode = require('resCode');
+const resCode = require('./resCode');
 
 const verifyToken = (req, res, next) => {
   if (!req.headers["api-token"] || !req.headers["project-type"]) {
