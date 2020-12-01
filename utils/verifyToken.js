@@ -3,7 +3,7 @@ const resCode = require('./resCode');
 
 const verifyToken = (req, res, next) => {
   if (!req.headers["api-token"] || !req.headers["project-type"]) {
-    return res.status(400).json({ message: "thiếu api-token hoặc project-type" });
+    return res.status(400).json({ code: resCode.BAD_REQUEST.code ,message: "thiếu api-token hoặc project-type" });
   } else {
     var data = '';
     var config = {

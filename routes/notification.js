@@ -13,6 +13,8 @@ router.post('/create_ntf', async (req, res) => {
   let statusText =['tạo mới', 'cập nhật', 'xóa'];
   try {
     let { fromUserID, toUserIDs, status, refID } = req.body;
+    if (!fromUserID || !toUserIDs|| !status || !refID) 
+      res.status(400).json({code: resCode.BAD_REQUEST.code, message: " thiếu parameter"});
     // status: 0: new, 1: update, 2:delete
     let newNtf = new Ntf();
 
