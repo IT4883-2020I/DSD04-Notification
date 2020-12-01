@@ -73,10 +73,10 @@ router.get('/get_list_ntf', verifyToken, async (req, res) => {
 // get
 router.get('/get_ntf', verifyToken, async (req, res) => {
   let idNtf = req.query.idNtf;
-  if (!idNtf) return res.status(400).json({ code: 1001, message: "thiếu param" });
+  if (!idNtf) return res.status(400).json({ code: resCode.BAD_REQUEST.code, message: "thiếu param" });
   try {
     let ntf = await Ntf.findById(idNtf);
-    if (!ntf) return res.status(404).json({ message: "not found" });
+    if (!ntf) return res.status(404).json({ code: resCode.NOT_FOUND.code, message: "not found" });
     res.status(200).json({ code: resCode.OK.code, message: "OK", data: ntf});
   } catch (error) {
     res.status(500).json({ code: resCode.UNKNOWN_ERROR.code, message: error.message });
