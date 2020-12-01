@@ -14,7 +14,7 @@ router.post('/create_ntf', async (req, res) => {
   try {
     let { fromUserID, toUserIDs, status, refID } = req.body;
     console.log(typeof fromUserID === 'string', Array.isArray(toUserIDs), typeof status === 'number', typeof refID === 'string')
-    if (!fromUserID || !toUserIDs|| status < 0 || status > 2 || !refID) 
+    if (!fromUserID || !toUserIDs|| status == undefined || status < 0 || status > 2 || !refID) 
       return res.status(400).json({code: resCode.BAD_REQUEST.code, message: " thiếu parameter"});
     
     // status: 0: new, 1: update, 2:delete
