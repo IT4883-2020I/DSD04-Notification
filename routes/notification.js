@@ -47,7 +47,7 @@ router.post('/create_ntf', async (req, res) => {
     newNtf.project_type = req.headers['project-type'];
     let saved = await newNtf.save();
     let data = {
-      ntfID: saved._id,
+      id: saved._id,
       title: saved.content,
       link: saved.ref._link,
       project_type: saved.project_type
