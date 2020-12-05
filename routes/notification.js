@@ -49,10 +49,26 @@ router.post('/create_ntf', async (req, res) => {
 
 // get_list_ntf
 router.get('/get_list_ntf', verifyToken, async (req, res) => {
+  let {index, count} = req.query;
+  if (index === undefined || count === undefined) 
+    return res.status(400).json({code: resCode.BAD_REQUEST.code, message: "thiếu tham số"});
+  index = parseInt(index, 10);
+  count = parseInt(count, 10);
+  if (isNaN(index) || isNaN (count)) 
+    return res.status(400).json({code: resCode.BAD_REQUEST.code, message: "sai kiểu tham số"});
+  if (!Number.isInteger(index) || !Number.isInteger(count))
+    return res.status(400).json({code: resCode.BAD_REQUEST.code, message: "sai kiểu tham số"});
+  if (index < 0 || count < 0)
+    return res.status(400).json({code: resCode.BAD_REQUEST.code, message: "sai giá trị tham số"});
+  
   let id = req.user.id;
   try {
     let Ntfs = await Ntf.find({ "toUser._id": id }).sort("-createdAt");
-    res.status(200).json({ code: resCode.OK.code, message: "OK", data: Ntfs });
+    let result = Ntfs.slice(index, count);
+    res.status(200).json({ code: resCode.OK.code, message: "OK", data: {
+      notifications: result,
+      total: Ntfs.length
+    } });
   } catch (error) {
     res.status(500).json({ code: resCode.UNKNOWN_ERROR.code, message: error.message });
   }
