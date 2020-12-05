@@ -64,7 +64,7 @@ router.get('/get_list_ntf', verifyToken, async (req, res) => {
   let id = req.user.id;
   try {
     let Ntfs = await Ntf.find({ "toUser._id": id }).sort("-createdAt");
-    let result = Ntfs.slice(index, count);
+    let result = Ntfs.slice(index, index + count);
     res.status(200).json({ code: resCode.OK.code, message: "OK", data: {
       notifications: result,
       total: Ntfs.length
