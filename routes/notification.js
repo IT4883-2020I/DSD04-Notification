@@ -4,7 +4,7 @@ const Ntf = require('../models/Notification');
 const FollowRef = require('../models/followRef');
 const verifyToken = require('../utils/verifyToken');
 const router = express.Router();
-const resCode = require('../utils/resCode');
+const {resType, callRes} = require('../utils/response');
 var axios = require('axios');
 
 
@@ -13,11 +13,10 @@ router.post('/create_ntf', async (req, res) => {
   let statusText =['tạo mới', 'cập nhật', 'xóa'];
   try {
     let { fromUserID, toUserIDs, status, refID } = req.body;
-    console.log(typeof fromUserID === 'string', Array.isArray(toUserIDs), typeof status === 'number', typeof refID === 'string')
     if (!fromUserID || !toUserIDs|| status == undefined || !refID) 
-      return res.status(400).json({code: resCode.BAD_REQUEST.code, message: " thiếu parameter"});
+      return callRes(res,resType.BAD_REQUEST, 'thiếu parameter');
     if  (status < 0 || status > 2)
-      return res.status(400).json({code: resCode.BAD_REQUEST.code, message: " sai parameter"});
+      return callRes(res,resType.BAD_REQUEST, 'sai parameter');
     // status: 0: new, 1: update, 2:delete
     let newNtf = new Ntf();
 
@@ -40,10 +39,9 @@ router.post('/create_ntf', async (req, res) => {
       link: saved.ref._link,
       project_type: saved.project_type
     }
-    res.status(200).json({ code: resCode.OK.code, message: "OK", data: data });
+    return callRes(res, resType.OK, data);
   } catch (error) {
-    console.log(error)
-    res.status(500).json({ code: resCode.UNKNOWN_ERROR.code, message: error.message });
+    return callRes(res, resType.UNKNOWN_ERROR, error.message);
   }
 })
 
@@ -51,39 +49,38 @@ router.post('/create_ntf', async (req, res) => {
 router.get('/get_list_ntf', verifyToken, async (req, res) => {
   let {index, count} = req.query;
   if (index === undefined || count === undefined) 
-    return res.status(400).json({code: resCode.BAD_REQUEST.code, message: "thiếu tham số"});
+    return callRes(res, resType.BAD_REQUEST, 'thiếu tham số');
   index = parseInt(index, 10);
   count = parseInt(count, 10);
   if (isNaN(index) || isNaN (count)) 
-    return res.status(400).json({code: resCode.BAD_REQUEST.code, message: "sai kiểu tham số"});
+    return callRes(res, resType.BAD_REQUEST, 'sai kiểu tham số');
   if (!Number.isInteger(index) || !Number.isInteger(count))
-    return res.status(400).json({code: resCode.BAD_REQUEST.code, message: "sai kiểu tham số"});
+    return callRes(res, resType.BAD_REQUEST, 'sai kiểu tham số');
   if (index < 0 || count < 0)
-    return res.status(400).json({code: resCode.BAD_REQUEST.code, message: "sai giá trị tham số"});
-  
+    return callRes(res, resType.BAD_REQUEST, 'sai giá trị tham số');
   let id = req.user.id;
   try {
     let Ntfs = await Ntf.find({ "toUser._id": id }).sort("-createdAt");
     let result = Ntfs.slice(index, index + count);
-    res.status(200).json({ code: resCode.OK.code, message: "OK", data: {
+    return callRes(res, resType.OK, {
       notifications: result,
       total: Ntfs.length
-    } });
+    });
   } catch (error) {
-    res.status(500).json({ code: resCode.UNKNOWN_ERROR.code, message: error.message });
+    return callRes(res, resType.UNKNOWN_ERROR, error.message);
   }
 })
 
 // get
 router.get('/get_ntf', verifyToken, async (req, res) => {
   let idNtf = req.query.idNtf;
-  if (!idNtf) return res.status(400).json({ code: resCode.BAD_REQUEST.code, message: "thiếu param" });
+  if (!idNtf) return callRes(res, resType.BAD_REQUEST, 'thiếu param');
   try {
     let ntf = await Ntf.findById(idNtf);
-    if (!ntf) return res.status(404).json({ code: resCode.NOT_FOUND.code, message: "not found" });
-    res.status(200).json({ code: resCode.OK.code, message: "OK", data: ntf});
+    if (!ntf) return callRes(res, resType.NOT_FOUND,'not found');
+    return callRes(res, resType.OK, ntf);
   } catch (error) {
-    res.status(500).json({ code: resCode.UNKNOWN_ERROR.code, message: error.message });
+    return callRes(res, resType.UNKNOWN_ERROR, error.message);
   }
 })
 
@@ -91,18 +88,18 @@ router.get('/get_ntf', verifyToken, async (req, res) => {
 router.put('/mark_seen_ntf', verifyToken, async (req, res) => {
   let userId = req.user.id;
   let idNtf = req.body.idNtf;
-  if (!idNtf) return res.status(400).json({code: resCode.BAD_REQUEST.code,  message: "thiếu param" });
+  if (!idNtf) return callRes(res, resType.BAD_REQUEST, 'thiếu param');
   try {
     let ntf = await Ntf.findById(idNtf);
-    if (!ntf) return res.status(404).json({ code: resCode.NOT_FOUND.code, message: "not found" });
+    if (!ntf) return callRes(res, resType.NOT_FOUND,'not found');
     let index = ntf.toUser.findIndex(e => e._id == userId);
-    if (index < 0) return res.status(400).json({ code: resCode.BAD_REQUEST.code, message: "user không trong danh sách nhận thông báo" });
-    if (ntf.toUser[index].isSeen == true) return res.status(400).json({ code: resCode.BAD_REQUEST.code, message: "hành động đã thực hiện" });
+    if (index < 0) return callRes(res, resType.BAD_REQUEST, 'user không trong danh sách nhận thông báo');
+    if (ntf.toUser[index].isSeen == true) return callRes(res,resType.BAD_REQUEST, 'hành động đã thực hiện');
     ntf.toUser[index].isSeen = true;
     await ntf.save();
-    res.status(200).json({ code: resCode.OK.code, message: "OK" });
+    return callRes(res, resType.OK);
   } catch (error) {
-    res.status(500).json({ code: resCode.UNKNOWN_ERROR.code, message: error.message });
+    return callRes(res, resType.UNKNOWN_ERROR, error.message);
   }
 })
 
@@ -110,18 +107,18 @@ router.put('/mark_seen_ntf', verifyToken, async (req, res) => {
 router.put('/mark_unSeen_ntf', verifyToken, async (req, res) => {
   let userId = req.user.id;
   let idNtf = req.body.idNtf;
-  if (!idNtf) return res.status(400).json({ code: resCode.BAD_REQUEST.code, message: "thiếu param" });
+  if (!idNtf) return callRes(res, resType.BAD_REQUEST, 'thiếu param');
   try {
     let ntf = await Ntf.findById(idNtf);
-    if (!ntf) return res.status(404).json({ code: resCode.NOT_FOUND.code, message: "not found" });
+    if (!ntf) return callRes(res, resType.NOT_FOUND,'not found');
     let index = ntf.toUser.findIndex(e => e._id == userId);
-    if (index < 0) return res.status(400).json({ code: resCode.BAD_REQUEST.code,message: "user không trong danh sách nhận thông báo" });
-    if (ntf.toUser[index].isSeen == false) return res.status(400).json({ code:resCode.BAD_REQUEST.code, message: "hành động đã thực hiện" });
+    if (index < 0) return callRes(res, resType.BAD_REQUEST, 'user không trong danh sách nhận thông báo');
+    if (ntf.toUser[index].isSeen == false) return callRes(res,resType.BAD_REQUEST, 'hành động đã thực hiện');
     ntf.toUser[index].isSeen = false;
     await ntf.save();
-    res.status(200).json({ code: resCode.OK.code, message: "OK" });
+    return callRes(res, resType.OK);
   } catch (error) {
-    res.status(500).json({ code: resCode.UNKNOWN_ERROR.code, message: error.message });
+    return callRes(res, resType.UNKNOWN_ERROR, error.message);
   }
 })
 
@@ -129,18 +126,19 @@ router.put('/mark_unSeen_ntf', verifyToken, async (req, res) => {
 router.delete('/delete_ntf', verifyToken, async (req, res) => {
   let userId = req.user.id;
   let idNtf = req.body.idNtf;
-  if (!idNtf) return res.status(400).json({ code: resCode.BAD_REQUEST.code, message: "thiếu param" });
+  if (!idNtf) return callRes(res, resType.BAD_REQUEST, 'thiếu param');
   try {
     let ntf = await Ntf.findById(idNtf);
-    if (!ntf) return res.status(404).json({ code: resCode.NOT_FOUND.code, message: "not found" });
+    if (!ntf) return callRes(res, resType.NOT_FOUND,'not found');
     let index = ntf.toUser.findIndex(e => e._id == userId);
-    if (index < 0) return res.status(400).json({ code: resCode.BAD_REQUEST.code, message: "user không trong danh sách nhận thông báo" });
-    if (ntf.toUser[index].status == 1) return res.status(400).json({ code: resCode.BAD_REQUEST.code, message: "hành động đã thực hiện" });
+    if (index < 0) return callRes(res, resType.BAD_REQUEST, 'user không trong danh sách nhận thông báo');
+    if (ntf.toUser[index].status == 1) return callRes(res,resType.BAD_REQUEST, 'hành động đã thực hiện');
+    ntf.toUser[index].isSeen = false;
     ntf.toUser[index].status = 1;
     await ntf.save();
-    res.status(200).json({ code: resCode.OK.code, message: "OK" });
+    return callRes(res, resType.OK);
   } catch (error) {
-    res.status(500).json({ code: resCode.UNKNOWN_ERROR.code, message: error.message });
+    return callRes(res, resType.UNKNOWN_ERROR, error.message);
   }
 })
 
@@ -148,18 +146,18 @@ router.delete('/delete_ntf', verifyToken, async (req, res) => {
 router.delete('/unDelete_ntf', verifyToken, async (req, res) => {
   let userId = req.user.id;
   let idNtf = req.body.idNtf;
-  if (!idNtf) return res.status(400).json({ code: resCode.BAD_REQUEST.code, message: "thiếu param" });
+  if (!idNtf) return callRes(res, resType.BAD_REQUEST, 'thiếu param');
   try {
     let ntf = await Ntf.findById(idNtf);
-    if (!ntf) return res.status(404).json({ code: resCode.NOT_FOUND.code, message: "not found" });
+    if (!ntf) return callRes(res, resType.NOT_FOUND,'not found');
     let index = ntf.toUser.findIndex(e => e._id == userId);
-    if (index < 0) return res.status(400).json({ code: resCode.BAD_REQUEST.code, message: "user không trong danh sách nhận thông báo" });
-    if (ntf.toUser[index].status == 0) return res.status(400).json({ code: resCode.BAD_REQUEST.code, message: "hành động đã thực hiện" });
+    if (index < 0) return callRes(res, resType.BAD_REQUEST, 'user không trong danh sách nhận thông báo');
+    if (ntf.toUser[index].status == 0) return callRes(res,resType.BAD_REQUEST, 'hành động đã thực hiện');
     ntf.toUser[index].status = 0;
     await ntf.save();
-    res.status(200).json({ code: resCode.OK.code, message: "OK" });
+    return callRes(res, resType.OK);
   } catch (error) {
-    res.status(500).json({ code: resCode.UNKNOWN_ERROR.code, message: error.message });
+    return callRes(res, resType.UNKNOWN_ERROR, error.message);
   }
 })
 
@@ -167,8 +165,8 @@ router.delete('/unDelete_ntf', verifyToken, async (req, res) => {
 router.post('/follow_ref', verifyToken, async (req, res) => {
   let userId = req.user.id;
   let { refId, isFollow } = req.body;
-  if (!refId || isFollow == undefined) return res.status(400).json({ code: resCode.BAD_REQUEST.code, message: "thiếu param" });
-  if (typeof (isFollow) !== "boolean") return res.status(400).json({ code: resCode.BAD_REQUEST.code, message: "sai định dạng param" });
+  if (!refId || isFollow == undefined) return callRes(res, resType.BAD_REQUEST, 'thiếu param');
+  if (typeof (isFollow) !== "boolean") return callRes(res, resType.BAD_REQUEST, 'sai định dạng param');
 
   try {
     let followRef = await FollowRef.findOne({ "ref._id": refId });
@@ -182,33 +180,32 @@ router.post('/follow_ref', verifyToken, async (req, res) => {
     }
     let index = followRef.followers.findIndex(e => e._id == userId);
     if (index < 0) {
-      if (isFollow == false) return res.status(400).json({ code: resCode.BAD_REQUEST.code, message: "hành động đã thực hiện" });
+      if (isFollow == false) return callRes(res,resType.BAD_REQUEST, 'hành động đã thực hiện');
       followRef.followers.push({ _id: userId });
     } else {// tim thay user dang follow ref
-      if (isFollow == true) return res.status(400).json({ code: resCode.BAD_REQUEST.code, message: "hành động đã thực hiện" });
+      if (isFollow == true) return callRes(res,resType.BAD_REQUEST, 'hành động đã thực hiện');
       followRef.followers.splice(index, 1);
     }
     let saved = await followRef.save();
-    return res.status(200).json({ code: resCode.OK.code, message: "OK", data: saved });
+    return callRes(res, resType.OK, saved);
   } catch (error) {
-    return res.status(500).json({ code: resCode.UNKNOWN_ERROR.code, message: error.message });
+    return callRes(res, resType.UNKNOWN_ERROR, error.message);
   }
 })
 
 // get_followers
 router.post('/get_followers', verifyToken, async (req, res) => {
-  let userId = req.user.id;
   let { refId } = req.body;
   let data = [];
-  if (!refId ) return res.status(400).json({ code: resCode.BAD_REQUEST.code, message: "thiếu param" });
+  if (!refId ) return callRes(res, resType.BAD_REQUEST, 'thiếu param');
   try {
     let followRef = await FollowRef.findOne({ "ref._id": refId });
     if (followRef) {
       data = followRef.followers;
     } 
-    return res.status(200).json({code: resCode.OK.code, message: "OK", data: data});
+    return callRes(res, resType.OK, data);
   } catch (error) {
-    return res.status(500).json({ code: resCode.UNKNOWN_ERROR.code, message: error.message });
+    return callRes(res, resType.UNKNOWN_ERROR, error.message);
   }
 })
 

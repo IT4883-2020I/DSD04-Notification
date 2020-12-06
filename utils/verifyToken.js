@@ -1,9 +1,9 @@
 var axios = require('axios');
-const resCode = require('./resCode');
+const { resType, callRes } = require('./response');
 
 const verifyToken = (req, res, next) => {
   if (!req.headers["api-token"] || !req.headers["project-type"]) {
-    return res.status(400).json({ code: resCode.BAD_REQUEST.code ,message: "thiếu api-token hoặc project-type" });
+    return callRes(res, resType.BAD_REQUEST, 'thiếu api-token hoặc project-type');
   } else {
     var data = '';
     var config = {
@@ -22,11 +22,11 @@ const verifyToken = (req, res, next) => {
           req.user = response.data.result;
           next();
         } else {
-          return res.status(response.status).json({code : resCode.BAD_REQUEST.code, message: response.data.message});
+          return callRes(res, resType.BAD_REQUEST, response.data.message);
         }
       })
       .catch(function (error) {
-        return res.status(400).json({code : resCode.UNKNOWN_ERROR.code, message: error.message});
+        return callRes(res, resType.UNKNOWN_ERROR, error.message);
       });
   }
 }
