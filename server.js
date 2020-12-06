@@ -20,7 +20,7 @@ mongoose.connect(process.env.mongoURI,
   .catch(err => console.log(`error: ${err}`));
 
 // routes
-// app.use("/", require('./routes/test'));
+// app.use("/test", require('./routes/test'));
 app.use("/", require('./routes/notification'));
 
 const port = process.env.PORT || 5000;
