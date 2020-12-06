@@ -20,6 +20,19 @@ const NotificationSchema = new mongoose.Schema(
       status: { // người dùng phân loại thông báo. 0: mặc định, 1: đã xóa
         type: Number,
         default: 0
+      },
+      check: {
+        type: Boolean, // đánh giá xem gửi thông báo có đúng không
+        default: true
+      },
+      action: { 
+        actionCode: {
+          type: Number
+        },
+        isDone: {
+          type: Boolean,
+          default: false
+        }
       }
     }],
     content: { // nội dung thông báo
