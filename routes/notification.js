@@ -209,6 +209,62 @@ router.post('/get_followers', verifyToken, async (req, res) => {
   }
 })
 
+// count_ntf_type
+router.get('/count_ntf_type', verifyToken, async (req, res) => {
+  let {type} = req.query;
+  if (type === undefined ) 
+    return callRes(res, resType.BAD_REQUEST, 'thiếu tham số');
+  type = parseInt(type, 10);
+  if (isNaN(type)) 
+    return callRes(res, resType.BAD_REQUEST, 'sai kiểu tham số');
+  if (!Number.isInteger(type))
+    return callRes(res, resType.BAD_REQUEST, 'sai kiểu tham số');
+  if (type <= 0 || type > 14)
+    return callRes(res, resType.BAD_REQUEST, 'sai giá trị tham số');
+  try {
+    let Ntfs;
+    if (type <= 13){
+      Ntfs = await Ntf.find({ "ref._type": type });
+    } else {
+      Ntfs = await Ntf.find({"ref._type": {$in: [10,11,12,13]}});
+    }
+    let data = {
+      trueNtf: 0,
+      falseNtf: 0,
+      noneNft: 0,
+      totalNtf: 0
+    }
+    Ntfs.forEach(e => {
+      let total = e.toUser.length;
+      let t = (e.toUser.filter(user => user.check == true)).length;
+      let f = (e.toUser.filter(user => user.check == false)).length;
+      data.totalNtf += total;
+      data.trueNtf += t;
+      data.falseNtf += f;
+    })
+    data.noneNft = data.totalNtf - data.trueNtf - data.falseNtf;
+    return callRes(res, resType.OK, data)
+  } catch (error) {
+    return callRes(res, resType.UNKNOWN_ERROR, error.message);
+  }
+})
+
+router.get('/get_list_ntf_today_all_user', verifyToken, async (req, res) => {
+  try {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    let Ntfs = await Ntf.find({createdAt: {$gte: today}});
+    let data = {
+      total: Ntfs.length,
+      notifications: Ntfs
+    }
+    
+    return callRes(res, resType.OK, data);
+  } catch (error) {
+    return callRes(res, resType.UNKNOWN_ERROR, error.message);
+  }
+})
+
 module.exports = router;
 
 
