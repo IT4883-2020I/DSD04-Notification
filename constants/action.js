@@ -5,14 +5,14 @@ const actionType = {
     content_text: 'phát hiện sự cố',
     action_text: 'xác nhận',
     role: [roleType.ADMIN, roleType.SUPERVISOR],
-    requireResponse: false
+    requireResponse: true
   },
   INCIDENT_DETECTED_VIEW: {
     code: 1,
     content_text: 'phát hiện sự cố',
     action_text: 'xem',
     role: [roleType.ADMIN, roleType.SUPERVISOR],
-    requireResponse: true
+    requireResponse: false
   },
   WORK_NEW_VIEW: {
     code: 2,
