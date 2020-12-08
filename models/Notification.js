@@ -25,7 +25,7 @@ const NotificationSchema = new mongoose.Schema(
         type: Boolean, // đánh giá xem gửi thông báo có đúng không
         default: true
       },
-      action: { 
+      action: [{ 
         actionCode: {
           type: Number
         },
@@ -33,7 +33,7 @@ const NotificationSchema = new mongoose.Schema(
           type: Boolean,
           default: false
         }
-      }
+      }]
     }],
     content: { // nội dung thông báo
       type: String,
