@@ -26,7 +26,8 @@ const roleType = {
   },
   ALL: {
     code: 5,
-    text: 'Nhân viên'
+    text: 'Nhân viên',
+    role: ['ADMIN','MANAGER', 'SUPERVISOR', 'DRONE_STAFF', 'INCIDENT_STAFF']
   }
 }
 
@@ -42,4 +43,12 @@ function findRole(roleCode) {
   return (role) ? role : null;
 }
 // console.log(findRole(3))
-module.exports = {roleType, findRole};
+function checkRoleName(name, roleTypeName) {
+  if (Array.isArray(roleTypeName.role)) {
+    return roleTypeName.role.includes(name) ? true : false;
+  }
+  else return (roleTypeName.role == name) ? true : false;
+}
+// console.log(checkRoleName('DD', roleType.ADMIN))
+// console.log(checkRoleName('GG', roleType.ALL))
+module.exports = {roleType, findRole, checkRoleName};

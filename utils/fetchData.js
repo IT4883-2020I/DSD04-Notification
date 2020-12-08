@@ -121,7 +121,7 @@ async function fetchIDs(){
   data4.forEach(e => ids.INCIDENT_STAFF.push(e.id));
   return(ids);
 }
-// fetchIDs().then(ids => console.log(ids))
+
 
 function getUserById(id) {
   var config = {
@@ -143,6 +143,7 @@ function getUserById(id) {
     });
   })
 }
-// getUserById(2).then(data => console.log(data))
+fetchIDs().then(ids => console.log(ids))
+// getUserById(14).then(data => console.log(data))
 
 module.exports = {fetchIDs, getUserById}
