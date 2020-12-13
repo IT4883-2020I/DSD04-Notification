@@ -10,7 +10,7 @@ const {actionType, findAction} = require('../constants/action');
 const {roleType, findRole, checkRoleName} = require('../constants/role');
 const {fetchIDs, getUserById} = require('../utils/fetchData');
 // Create new Ntf
-router.post('/create_ntf', async (req, res) => {
+router.post('/create_ntf',  verifyToken ,async (req, res) => {
   let statusText =['tạo mới', 'cập nhật', 'xóa'];
   try {
     let { fromUserID, toUserIDs, status, refID } = req.body;
@@ -44,6 +44,105 @@ router.post('/create_ntf', async (req, res) => {
   } catch (error) {
     return callRes(res, resType.UNKNOWN_ERROR, error.message);
   }
+})
+
+router.post('/create_ntf_2', verifyToken, async (req, res) => {
+  try {
+    let defaultContent = [
+      'phát hiện sự cố mới',
+      'thông báo công việc mới',
+      'gửi báo cáo công việc', 
+      'review báo cáo công việc',
+    ]
+    let project_type = req.headers['project-type'];
+    let token = req.headers['api-token'];
+    const { fromUserID, toUserIDs, refID, refType, refLinkView, level, content, ntfType} = req.body;
+    if (!fromUserID || !toUserIDs|| !refID || !refType || !refLinkView || level === undefined || !content || ntfType === undefined) 
+      return callRes(res,resType.BAD_REQUEST, 'thiếu parameter');
+    if (!checkPossitiveInteger(refType) || !checkPossitiveInteger(ntfType)) 
+      return callRes(res,resType.BAD_REQUEST, 'sai giá trị tham số 1');
+    if (refType < 1 || refType > 13)
+      return callRes(res,resType.BAD_REQUEST, 'sai giá trị tham số 2');
+    if (ntfType < 0 || ntfType > 3)
+      return callRes(res,resType.BAD_REQUEST, 'sai giá trị tham số 3');
+    if ([10,11,12,13].includes(refType)){
+      if (ntfType !=0) return callRes(res, resType.BAD_REQUEST, 'sai giá trị ntfType')
+    }
+    if (refType == 8){
+      console.log('hi')
+      if (![1,2,3].includes(ntfType)) return callRes(res, resType.BAD_REQUEST, 'sai giá trị ntfType');
+    }
+    // fetchData
+    let fromUser = await getUserById(fromUserID, project_type, token);
+    let toUsers = [];
+    for (let e of toUserIDs){
+      let user = await getUserById(e, project_type, token);
+      if (!user) return callRes(res, resType.BAD_REQUEST, 'sai id bên nhận');
+      toUsers.push(user);
+    }
+    // validate current
+    if (fromUser.status != 'ACTIVE') 
+      return callRes(res, resType.BAD_REQUEST, 'người dùng ' + fromUserID + ' không active');
+
+    // console.log({fromUser, toUsers})
+    let newNtf = new Ntf();
+    newNtf.fromUser = {_id: fromUserID};
+    for (let user of toUsers){
+      let newElement = { 
+        _id: user.id,
+        action: []
+      }
+      switch (user.role) {
+        case roleType.ADMIN.role:
+          console.log(user.role);
+          if (ntfType == 0) 
+            newElement.action.push({actionCode: actionType.INCIDENT_DETECTED_VERIFY.code});
+          if (ntfType == 1);
+          if (ntfType == 2);
+          if (ntfType == 3);
+          break;
+        case roleType.MANAGER.role:
+          console.log(user.role);
+          break;
+        case roleType.SUPERVISOR.role:
+          console.log(user.role);
+          if (ntfType == 0) 
+            newElement.action.push({actionCode: actionType.INCIDENT_DETECTED_VERIFY.code});
+          break;
+        case roleType.DRONE_STAFF.role:
+          console.log(user.role);
+          break;
+        case roleType.INCIDENT_STAFF.role:
+          console.log(user.role);
+          break;
+        default:
+          console.log(user.role);
+          break;
+      }
+      newNtf.toUser.push(newElement);
+    }
+    newNtf.content = defaultContent[ntfType]+': ' + content;
+    newNtf.level = level;
+    newNtf.ref = {
+      _id: refID,
+      _type: refType,
+      _link: refLinkView
+    } 
+    newNtf.project_type = project_type;
+    console.log(newNtf);
+
+    let saved = await newNtf.save();
+    let data = {
+      id: saved._id,
+      title: saved.content,
+      link: saved.ref._link,
+      project_type: saved.project_type
+    }
+    return callRes(res, resType.OK, data);
+  } catch (error) {
+    return callRes(res, resType.UNKNOWN_ERROR, error.message);
+  }
+  
 })
 
 // Create new Ntf incident_detected
@@ -340,6 +439,58 @@ router.get('/get_list_ntf_today_all_user', verifyToken, async (req, res) => {
     }
     
     return callRes(res, resType.OK, data);
+  } catch (error) {
+    return callRes(res, resType.UNKNOWN_ERROR, error.message);
+  }
+})
+
+
+router.get('/get_list_ntf_project_type', verifyToken, async (req, res) => {
+  let {index, count, project_type} = req.query;
+  if (index === undefined || count === undefined) 
+    return callRes(res, resType.BAD_REQUEST, 'thiếu tham số');
+  index = parseInt(index, 10);
+  count = parseInt(count, 10);
+  if (isNaN(index) || isNaN (count)) 
+    return callRes(res, resType.BAD_REQUEST, 'sai kiểu tham số');
+  if (!Number.isInteger(index) || !Number.isInteger(count))
+    return callRes(res, resType.BAD_REQUEST, 'sai kiểu tham số');
+  if (index < 0 || count < 0)
+    return callRes(res, resType.BAD_REQUEST, 'sai giá trị tham số');
+  let id = req.user.id;
+  try {
+    let Ntfs = await Ntf.find({ "toUser._id": id, project_type: project_type }).sort("-createdAt");
+    let result = Ntfs.slice(index, index + count);
+    return callRes(res, resType.OK, {
+      total: Ntfs.length,
+      notifications: result
+    });
+  } catch (error) {
+    return callRes(res, resType.UNKNOWN_ERROR, error.message);
+  }
+})
+
+router.get('/get_list_ntf_level', verifyToken, async (req, res) => {
+  let {index, count, level} = req.query;
+  if (index === undefined || count === undefined || level === undefined) 
+    return callRes(res, resType.BAD_REQUEST, 'thiếu tham số');
+  index = parseInt(index, 10);
+  count = parseInt(count, 10);
+  level = parseInt(level, 10);
+  if (isNaN(index) || isNaN (count) || isNaN (level)) 
+    return callRes(res, resType.BAD_REQUEST, 'sai kiểu tham số');
+  if (!Number.isInteger(index) || !Number.isInteger(count))
+    return callRes(res, resType.BAD_REQUEST, 'sai kiểu tham số');
+  if (index < 0 || count < 0 || level < 1 || level > 5)
+    return callRes(res, resType.BAD_REQUEST, 'sai giá trị tham số');
+  let id = req.user.id;
+  try {
+    let Ntfs = await Ntf.find({ "toUser._id": id, level : level }).sort("-createdAt");
+    let result = Ntfs.slice(index, index + count);
+    return callRes(res, resType.OK, {
+      total: Ntfs.length,
+      notifications: result
+    });
   } catch (error) {
     return callRes(res, resType.UNKNOWN_ERROR, error.message);
   }
