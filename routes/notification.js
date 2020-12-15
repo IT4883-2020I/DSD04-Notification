@@ -446,7 +446,7 @@ router.get('/get_list_ntf_today_all_user', verifyToken, async (req, res) => {
 
 
 router.get('/get_list_ntf_project_type', verifyToken, async (req, res) => {
-  let {index, count, project_type} = req.query;
+  let {index, count, project_type, startTime, endTime} = req.query;
   if (index === undefined || count === undefined) 
     return callRes(res, resType.BAD_REQUEST, 'thiếu tham số');
   index = parseInt(index, 10);
@@ -457,9 +457,24 @@ router.get('/get_list_ntf_project_type', verifyToken, async (req, res) => {
     return callRes(res, resType.BAD_REQUEST, 'sai kiểu tham số');
   if (index < 0 || count < 0)
     return callRes(res, resType.BAD_REQUEST, 'sai giá trị tham số');
-  let id = req.user.id;
+  if (startTime === undefined || endTime === undefined) 
+    return callRes(res, resType.BAD_REQUEST, 'thiếu tham số');
+  startTime = parseInt(startTime, 10);
+  endTime = parseInt(endTime, 10);
+  if (isNaN(startTime) || isNaN (endTime)) 
+    return callRes(res, resType.BAD_REQUEST, 'sai kiểu tham số');
+
+  let start = new Date(startTime);
+  let end = new Date(endTime);
+
   try {
-    let Ntfs = await Ntf.find({ "toUser._id": id, project_type: project_type }).sort("-createdAt");
+    let Ntfs = await Ntf.find({ 
+      project_type: project_type,
+      createdAt : {
+        $gte: start, 
+        $lte: end}
+      })
+      .sort("-createdAt");
     let result = Ntfs.slice(index, index + count);
     return callRes(res, resType.OK, {
       total: Ntfs.length,
