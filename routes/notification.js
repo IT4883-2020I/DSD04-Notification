@@ -42,7 +42,7 @@ router.post('/create_ntf',  verifyToken ,async (req, res) => {
     }
     return callRes(res, resType.OK, data);
   } catch (error) {
-    return callRes(res, resType.UNKNOWN_ERROR, error.message);
+    return callRes(res, resType.UNKNOWN_ERROR, error);
   }
 })
 
@@ -140,7 +140,8 @@ router.post('/create_ntf_2', verifyToken, async (req, res) => {
     }
     return callRes(res, resType.OK, data);
   } catch (error) {
-    return callRes(res, resType.UNKNOWN_ERROR, error.message);
+
+    return callRes(res, resType.UNKNOWN_ERROR, error);
   }
   
 })
@@ -200,7 +201,8 @@ router.post('/create_ntf_incident_detected', async (req, res) => {
     }
     return callRes(res, resType.OK, data);
   } catch (error) {
-    return callRes(res, resType.UNKNOWN_ERROR, error.message);
+    throw error;
+    return callRes(res, resType.UNKNOWN_ERROR, error);
   }
 })
 
@@ -226,7 +228,7 @@ router.get('/get_list_ntf', verifyToken, async (req, res) => {
       total: Ntfs.length
     });
   } catch (error) {
-    return callRes(res, resType.UNKNOWN_ERROR, error.message);
+    return callRes(res, resType.UNKNOWN_ERROR, error);
   }
 })
 
@@ -239,7 +241,7 @@ router.get('/get_ntf', verifyToken, async (req, res) => {
     if (!ntf) return callRes(res, resType.NOT_FOUND,'not found');
     return callRes(res, resType.OK, ntf);
   } catch (error) {
-    return callRes(res, resType.UNKNOWN_ERROR, error.message);
+    return callRes(res, resType.UNKNOWN_ERROR, error);
   }
 })
 
@@ -258,7 +260,7 @@ router.put('/mark_seen_ntf', verifyToken, async (req, res) => {
     await ntf.save();
     return callRes(res, resType.OK);
   } catch (error) {
-    return callRes(res, resType.UNKNOWN_ERROR, error.message);
+    return callRes(res, resType.UNKNOWN_ERROR, error);
   }
 })
 
@@ -277,7 +279,7 @@ router.put('/mark_unSeen_ntf', verifyToken, async (req, res) => {
     await ntf.save();
     return callRes(res, resType.OK);
   } catch (error) {
-    return callRes(res, resType.UNKNOWN_ERROR, error.message);
+    return callRes(res, resType.UNKNOWN_ERROR, error);
   }
 })
 
@@ -297,7 +299,7 @@ router.delete('/delete_ntf', verifyToken, async (req, res) => {
     await ntf.save();
     return callRes(res, resType.OK);
   } catch (error) {
-    return callRes(res, resType.UNKNOWN_ERROR, error.message);
+    return callRes(res, resType.UNKNOWN_ERROR, error);
   }
 })
 
@@ -316,7 +318,7 @@ router.delete('/unDelete_ntf', verifyToken, async (req, res) => {
     await ntf.save();
     return callRes(res, resType.OK);
   } catch (error) {
-    return callRes(res, resType.UNKNOWN_ERROR, error.message);
+    return callRes(res, resType.UNKNOWN_ERROR, error);
   }
 })
 
@@ -348,7 +350,7 @@ router.post('/follow_ref', verifyToken, async (req, res) => {
     let saved = await followRef.save();
     return callRes(res, resType.OK, saved);
   } catch (error) {
-    return callRes(res, resType.UNKNOWN_ERROR, error.message);
+    return callRes(res, resType.UNKNOWN_ERROR, error);
   }
 })
 
@@ -364,7 +366,7 @@ router.post('/get_followers', verifyToken, async (req, res) => {
     } 
     return callRes(res, resType.OK, data);
   } catch (error) {
-    return callRes(res, resType.UNKNOWN_ERROR, error.message);
+    return callRes(res, resType.UNKNOWN_ERROR, error);
   }
 })
 
@@ -384,7 +386,7 @@ router.post('/check_ntf', verifyToken, async (req, res) => {
     }
     return callRes(res, resType.OK);
   } catch (error) {
-    return callRes(res, resType.UNKNOWN_ERROR, error.message);
+    return callRes(res, resType.UNKNOWN_ERROR, error);
   }
 })
 
@@ -424,7 +426,7 @@ router.get('/count_ntf_type', verifyToken, async (req, res) => {
     data.noneNft = data.totalNtf - data.trueNtf - data.falseNtf;
     return callRes(res, resType.OK, data)
   } catch (error) {
-    return callRes(res, resType.UNKNOWN_ERROR, error.message);
+    return callRes(res, resType.UNKNOWN_ERROR, error);
   }
 })
 
@@ -440,7 +442,7 @@ router.get('/get_list_ntf_today_all_user', verifyToken, async (req, res) => {
     
     return callRes(res, resType.OK, data);
   } catch (error) {
-    return callRes(res, resType.UNKNOWN_ERROR, error.message);
+    return callRes(res, resType.UNKNOWN_ERROR, error);
   }
 })
 
@@ -481,7 +483,7 @@ router.get('/get_list_ntf_project_type', verifyToken, async (req, res) => {
       notifications: result
     });
   } catch (error) {
-    return callRes(res, resType.UNKNOWN_ERROR, error.message);
+    return callRes(res, resType.UNKNOWN_ERROR, error);
   }
 })
 
@@ -507,7 +509,7 @@ router.get('/get_list_ntf_level', verifyToken, async (req, res) => {
       notifications: result
     });
   } catch (error) {
-    return callRes(res, resType.UNKNOWN_ERROR, error.message);
+    return callRes(res, resType.UNKNOWN_ERROR, error);
   }
 })
 
