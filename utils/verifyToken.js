@@ -26,7 +26,7 @@ const verifyToken = (req, res, next) => {
         }
       })
       .catch(function (error) {
-        return callRes(res, resType.UNKNOWN_ERROR, error.message);
+        return callRes(res, resType.UNKNOWN_ERROR, error);
       });
   }
 }
