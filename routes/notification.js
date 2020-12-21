@@ -232,6 +232,38 @@ router.get('/get_list_ntf', verifyToken, async (req, res) => {
   }
 })
 
+// get_list_ntf_type
+router.get('/get_list_ntf_type', verifyToken, async (req, res) => {
+  let {index, count, type} = req.query;
+  if (index === undefined || count === undefined || type === undefined) 
+    return callRes(res, resType.BAD_REQUEST, 'thiếu tham số');
+  index = parseInt(index, 10);
+  count = parseInt(count, 10);
+  type = parseInt(type, 10);
+  if (isNaN(index) || isNaN (count) || isNaN (type)) 
+    return callRes(res, resType.BAD_REQUEST, 'sai kiểu tham số');
+  if (!Number.isInteger(index) || !Number.isInteger(count) || !Number.isInteger(type))
+    return callRes(res, resType.BAD_REQUEST, 'sai kiểu tham số');
+  if (index < 0 || count < 0 || type < 0)
+    return callRes(res, resType.BAD_REQUEST, 'sai giá trị tham số');
+  let id = req.user.id;
+  try {
+    let Ntfs;
+    if (type <= 13){
+      Ntfs = await Ntf.find({ "ref._type": type, "toUser._id": id }).sort("-createdAt");
+    } else {
+      Ntfs = await Ntf.find({"ref._type": {$in: [10,11,12,13]}, "toUser._id": id }).sort("-createdAt");
+    }
+    let result = Ntfs.slice(index, index + count);
+    return callRes(res, resType.OK, {
+      notifications: result,
+      total: Ntfs.length
+    });
+  } catch (error) {
+    return callRes(res, resType.UNKNOWN_ERROR, error);
+  }
+})
+
 // get
 router.get('/get_ntf', verifyToken, async (req, res) => {
   let idNtf = req.query.idNtf;
