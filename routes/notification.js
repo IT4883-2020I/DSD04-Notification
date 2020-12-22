@@ -148,17 +148,19 @@ router.post('/create_ntf_2', verifyToken, async (req, res) => {
 
 // Create new Ntf incident_detected
 router.post('/create_ntf_incident_detected', async (req, res) => {
+  let project_type = req.headers['project-type'];
+  let token = req.headers['api-token'];
   try {
     let { fromUserID, toUserIDs, refID } = req.body;
     if (!fromUserID || !toUserIDs || !refID) 
       return callRes(res,resType.BAD_REQUEST, 'thiếu parameter');
     let newNtf = new Ntf();
-    let fromUser = await getUserById(fromUserID);
+    let fromUser = await getUserById(fromUserID, project_type, token);
     console.log(fromUser)
     newNtf.fromUser = {_id: fromUserID};
     let toUsers = [];
     for (let e of toUserIDs){
-      let user = await getUserById(e);
+      let user = await getUserById(e, project_type, token);
       if (!user) return callRes(res, resType.BAD_REQUEST, 'sai id bên nhận');
       toUsers.push(user);
     }
