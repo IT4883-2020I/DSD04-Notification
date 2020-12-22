@@ -22,7 +22,7 @@ const verifyToken = (req, res, next) => {
           req.user = response.data.result;
           next();
         } else {
-          return callRes(res, resType.BAD_REQUEST, response.data.message);
+          return callRes(res, resType.BAD_REQUEST, 'USER ERROR: '+ response.data.message);
         }
       })
       .catch(function (error) {

@@ -74,12 +74,20 @@ router.post('/create_ntf_2', verifyToken, async (req, res) => {
     }
     // fetchData
     let fromUser = await getUserById(fromUserID, project_type, token);
-    let toUsers = [];
+    let toUsers;
+    let promises = [];
     for (let e of toUserIDs){
-      let user = await getUserById(e, project_type, token);
-      if (!user) return callRes(res, resType.BAD_REQUEST, 'sai id bên nhận');
-      toUsers.push(user);
+      let promise =  getUserById(e, project_type, token);
+      promises.push(promise);
     }
+    try {
+      toUsers = await Promise.all(promises);
+    } catch (err) {
+      console.log(err);
+      return callRes(res, resType.BAD_REQUEST, 'toUserID lỗi');
+    }
+
+
     // validate current
     if (fromUser.status != 'ACTIVE') 
       return callRes(res, resType.BAD_REQUEST, 'người dùng ' + fromUserID + ' không active');
