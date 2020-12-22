@@ -268,7 +268,7 @@ router.get('/get_list_ntf', verifyToken, async (req, res) => {
 // })
 
 // get_list_ntf_type
-router.get('/get_list_ntf_type', verifyToken, async (req, res) => {
+router.get('/get_list_ntf_type', async (req, res) => {
   let {index, count, type, userID} = req.query;
   if (index === undefined || count === undefined || type === undefined || userID === undefined) 
     return callRes(res, resType.BAD_REQUEST, 'thiếu tham số');
