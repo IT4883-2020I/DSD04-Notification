@@ -286,7 +286,7 @@ router.get('/get_list_ntf_type', async (req, res) => {
     if (type <= 13){
       Ntfs = await Ntf.find({ "ref._type": type, "toUser._id": userID }).sort("-createdAt");
     } else if (type == 14){
-      Ntfs = await Ntf.find({"ref._type": {$in: [10,11,12,13]}, "toUser._id": id }).sort("-createdAt");
+      Ntfs = await Ntf.find({"ref._type": {$in: [10,11,12,13]}, "toUser._id": userID }).sort("-createdAt");
     } else if (type == 15){
       Ntfs = await Ntf.find({ "toUser._id": userID }).sort("-createdAt");
     }
