@@ -201,7 +201,7 @@ router.post('/create_ntf_incident_detected', async (req, res) => {
     }
     return callRes(res, resType.OK, data);
   } catch (error) {
-    throw error;
+
     return callRes(res, resType.UNKNOWN_ERROR, error);
   }
 })
