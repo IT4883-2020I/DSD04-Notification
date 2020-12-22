@@ -53,6 +53,7 @@ router.post('/create_ntf_2', verifyToken, async (req, res) => {
       'thông báo công việc mới',
       'gửi báo cáo công việc', 
       'review báo cáo công việc',
+      'có đợt giám sát mới'
     ]
     let project_type = req.headers['project-type'];
     let token = req.headers['api-token'];
@@ -63,10 +64,10 @@ router.post('/create_ntf_2', verifyToken, async (req, res) => {
       return callRes(res,resType.BAD_REQUEST, 'sai giá trị tham số not integer');
     if (refType < 1 || refType > 13)
       return callRes(res,resType.BAD_REQUEST, 'sai giá trị tham số ngoài phạm vi refType');
-    if (ntfType < 0 || ntfType > 3)
+    if (ntfType < 0 || ntfType > 4)
       return callRes(res,resType.BAD_REQUEST, 'sai giá trị tham số ngoài phạm vi ntfType');
     if ([10,11,12,13].includes(refType)){
-      if (ntfType !=0) return callRes(res, resType.BAD_REQUEST, 'sai giá trị ntfType')
+      if (ntfType !=0) return callRes(res, resType.BAD_REQUEST, 'sai giá trị ntfType, phải là 0')
 
       switch (project_type) {
         case 'LUOI_DIEN':
@@ -87,7 +88,10 @@ router.post('/create_ntf_2', verifyToken, async (req, res) => {
     }
     if (refType == 8){
       console.log('hi')
-      if (![1,2,3].includes(ntfType)) return callRes(res, resType.BAD_REQUEST, 'sai giá trị ntfType');
+      if (![1,2,3].includes(ntfType)) return callRes(res, resType.BAD_REQUEST, 'sai giá trị ntfType, phải là 1,2,3');
+    }
+    if (refType == 9){
+      if (ntfType != 4) return callRes(res, resType.BAD_REQUEST, 'sai giá trị ntfType, phải là 4');
     }
     // fetchData
     let fromUser = await getUserById(fromUserID, project_type, token);
