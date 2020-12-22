@@ -171,67 +171,67 @@ router.post('/create_ntf_2', verifyToken, async (req, res) => {
   
 })
 
-// Create new Ntf incident_detected
-router.post('/create_ntf_incident_detected', async (req, res) => {
-  let project_type = req.headers['project-type'];
-  let token = req.headers['api-token'];
-  try {
-    let { fromUserID, toUserIDs, refID } = req.body;
-    if (!fromUserID || !toUserIDs || !refID) 
-      return callRes(res,resType.BAD_REQUEST, 'thiếu parameter');
-    let newNtf = new Ntf();
-    let fromUser = await getUserById(fromUserID, project_type, token);
-    console.log(fromUser)
-    newNtf.fromUser = {_id: fromUserID};
-    let toUsers = [];
-    for (let e of toUserIDs){
-      let user = await getUserById(e, project_type, token);
-      if (!user) return callRes(res, resType.BAD_REQUEST, 'sai id bên nhận');
-      toUsers.push(user);
-    }
-    for (let user of toUsers){
-      let newElement = { 
-        _id: user.id,
-        action: []
-      }
-      switch (user.role) {
-        case roleType.ADMIN.role:
-          newElement.action.push({actionCode: actionType.INCIDENT_DETECTED_VIEW.code});
-          break;
-        case roleType.SUPERVISOR.role:
-          newElement.action.push({actionCode: actionType.INCIDENT_DETECTED_VIEW.code});
-          newElement.action.push({actionCode: actionType.INCIDENT_DETECTED_VERIFY.code});
-          break;
-        default:
-          return callRes(res, resType.BAD_REQUEST, 'user với role ko nhận thông báo');
-          break;
-      }
-      newNtf.toUser.push(newElement);
-    }
+// // Create new Ntf incident_detected
+// router.post('/create_ntf_incident_detected',  async (req, res) => {
+//   let project_type = req.headers['project-type'];
+//   let token = req.headers['api-token'];
+//   try {
+//     let { fromUserID, toUserIDs, refID } = req.body;
+//     if (!fromUserID || !toUserIDs || !refID) 
+//       return callRes(res,resType.BAD_REQUEST, 'thiếu parameter');
+//     let newNtf = new Ntf();
+//     let fromUser = await getUserById(fromUserID, project_type, token);
+//     console.log(fromUser)
+//     newNtf.fromUser = {_id: fromUserID};
+//     let toUsers = [];
+//     for (let e of toUserIDs){
+//       let user = await getUserById(e, project_type, token);
+//       if (!user) return callRes(res, resType.BAD_REQUEST, 'sai id bên nhận');
+//       toUsers.push(user);
+//     }
+//     for (let user of toUsers){
+//       let newElement = { 
+//         _id: user.id,
+//         action: []
+//       }
+//       switch (user.role) {
+//         case roleType.ADMIN.role:
+//           newElement.action.push({actionCode: actionType.INCIDENT_DETECTED_VIEW.code});
+//           break;
+//         case roleType.SUPERVISOR.role:
+//           newElement.action.push({actionCode: actionType.INCIDENT_DETECTED_VIEW.code});
+//           newElement.action.push({actionCode: actionType.INCIDENT_DETECTED_VERIFY.code});
+//           break;
+//         default:
+//           return callRes(res, resType.BAD_REQUEST, 'user với role ko nhận thông báo');
+//           break;
+//       }
+//       newNtf.toUser.push(newElement);
+//     }
 
-    newNtf.content = roleType[fromUser.role].text +' ' + fromUser.full_name + 
-     ' ' + actionType.INCIDENT_DETECTED_VIEW.content_text +' ' + refID;
-    newNtf.level = 4;
-    newNtf.ref = {
-      _id: refID,
-      _type:  12,
-      _link: 'https://it4483.cf/incidents/' + refID
-    }
-    newNtf.project_type = req.headers['project-type'];
+//     newNtf.content = roleType[fromUser.role].text +' ' + fromUser.full_name + 
+//      ' ' + actionType.INCIDENT_DETECTED_VIEW.content_text +' ' + refID;
+//     newNtf.level = 4;
+//     newNtf.ref = {
+//       _id: refID,
+//       _type:  12,
+//       _link: 'https://it4483.cf/incidents/' + refID
+//     }
+//     newNtf.project_type = req.headers['project-type'];
     
-    let saved = await newNtf.save();
-    let data = {
-      id: saved._id,
-      title: saved.content,
-      link: saved.ref._link,
-      project_type: saved.project_type
-    }
-    return callRes(res, resType.OK, data);
-  } catch (error) {
+//     let saved = await newNtf.save();
+//     let data = {
+//       id: saved._id,
+//       title: saved.content,
+//       link: saved.ref._link,
+//       project_type: saved.project_type
+//     }
+//     return callRes(res, resType.OK, data);
+//   } catch (error) {
 
-    return callRes(res, resType.UNKNOWN_ERROR, error);
-  }
-})
+//     return callRes(res, resType.UNKNOWN_ERROR, error);
+//   }
+// })
 
 // get_list_ntf
 router.get('/get_list_ntf', verifyToken, async (req, res) => {
