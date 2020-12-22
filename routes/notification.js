@@ -60,13 +60,30 @@ router.post('/create_ntf_2', verifyToken, async (req, res) => {
     if (!fromUserID || !toUserIDs|| !refID || !refType || !refLinkView || level === undefined || !content || ntfType === undefined) 
       return callRes(res,resType.BAD_REQUEST, 'thiếu parameter');
     if (!checkPossitiveInteger(refType) || !checkPossitiveInteger(ntfType)) 
-      return callRes(res,resType.BAD_REQUEST, 'sai giá trị tham số 1');
+      return callRes(res,resType.BAD_REQUEST, 'sai giá trị tham số not integer');
     if (refType < 1 || refType > 13)
-      return callRes(res,resType.BAD_REQUEST, 'sai giá trị tham số 2');
+      return callRes(res,resType.BAD_REQUEST, 'sai giá trị tham số ngoài phạm vi refType');
     if (ntfType < 0 || ntfType > 3)
-      return callRes(res,resType.BAD_REQUEST, 'sai giá trị tham số 3');
+      return callRes(res,resType.BAD_REQUEST, 'sai giá trị tham số ngoài phạm vi ntfType');
     if ([10,11,12,13].includes(refType)){
       if (ntfType !=0) return callRes(res, resType.BAD_REQUEST, 'sai giá trị ntfType')
+
+      switch (project_type) {
+        case 'LUOI_DIEN':
+          if (refType != 10) return callRes(res, resType.BAD_REQUEST, 'sai project-type');
+          break;
+        case 'CAY_TRONG':
+          if (refType != 11) return callRes(res, resType.BAD_REQUEST, 'sai project-type');
+          break;
+        case 'CHAY_RUNG':
+          if (refType != 12) return callRes(res, resType.BAD_REQUEST, 'sai project-type');
+          break;
+        case 'DE_DIEU':
+          if (refType != 13) return callRes(res, resType.BAD_REQUEST, 'sai project-type');
+          break;
+        default:
+          break;
+      }
     }
     if (refType == 8){
       console.log('hi')
