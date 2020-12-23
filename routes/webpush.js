@@ -120,4 +120,4 @@ const pushNotification = (client, payload) => {
   });
 }
 
-module.exports = { handlePushNotificationSubscription, sendPushNotification, getNotifications };
+module.exports = { handlePushNotificationSubscription, sendPushNotification };
