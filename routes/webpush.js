@@ -31,13 +31,14 @@ const handlePushNotificationSubscription = (req, res) => {
     if (sub) return res.status(401).json({ code: 401, message: "Endpoint already exists in DB"})
     else if (!projectTypes.includes(project_type)) return res.status(400).json({ code: 400, message: "Your project type is not valid ('DE_DIEU', 'CAY_TRONG', 'CHAY_RUNG', 'LUOI_DIEN')"})
     else {
-      const newSub = new Subscription({
-        project_type: project_type,
-        userID: userID,
-        hash: subHash,
-        endpoint: subscription.endpoint,
-        subscription: subscription
-      })
+        console.log(`==================================userID: ${userID}`)
+        const newSub = new Subscription({
+            project_type: project_type,
+            userID: userID,
+            hash: subHash,
+            endpoint: subscription.endpoint,
+            subscription: subscription
+        })
       newSub.save().then(result => {
         res.status(201).json({
           code: 201,
@@ -58,7 +59,6 @@ const handlePushNotificationSubscription = (req, res) => {
 
 const sendPushNotification = async(project_type, payload, userID) => {
     console.log("someone calling push notification request")
-    const { project_type, payload, userID } = req.body;
     if (userID) {
       await Subscription.find({ userID: userID }, async(err, clients) => {
         try {
