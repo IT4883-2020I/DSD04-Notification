@@ -9,13 +9,13 @@ const vapidKeys = {
 
 webpush.setVapidDetails("mailto:example@yourdomain.org", vapidKeys.publicKey, vapidKeys.privateKey);
 
-createHash = (input) => {
+const createHash = (input) => {
   const md5sum = crypto.createHash("md5");
   md5sum.update(Buffer.from(input));
   return md5sum.digest("hex");
 }
 
-handlePushNotificationSubscription = (req, res) => {
+const handlePushNotificationSubscription = (req, res) => {
   console.log("someone calling subcribe request")
   const projectTypes = ['DE_DIEU', 'CAY_TRONG', 'CHAY_RUNG', 'LUOI_DIEN']
   const { subscription, project_type, userID } = req.body;
@@ -56,7 +56,7 @@ handlePushNotificationSubscription = (req, res) => {
   })
 }
 
-sendPushNotification = async(project_type, payload, userID) => {
+const sendPushNotification = async(project_type, payload, userID) => {
     console.log("someone calling push notification request")
     const { project_type, payload, userID } = req.body;
     if (userID) {

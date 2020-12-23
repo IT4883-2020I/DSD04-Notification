@@ -10,9 +10,9 @@ const subscriptionSchema = Schema({
     required: true,
     default: null
   },
-  userId: {
+  userID: {
     type: Schema.Types.String,
-    // required: true,
+    required: true,
     default: null
   },
   subscription: {
