@@ -19,6 +19,10 @@ const handlePushNotificationSubscription = (req, res) => {
   console.log("someone calling subcribe request")
   const projectTypes = ['DE_DIEU', 'CAY_TRONG', 'CHAY_RUNG', 'LUOI_DIEN']
   const { subscription, project_type, userID } = req.body;
+  if (!subscription) return res.json({
+    "code": "500",
+    "message": "cannot read subscription"
+  })
   console.log(`projectType: ${project_type}  -- userID: ${userID}`)
   const subHash = createHash(JSON.stringify({subscription, userID}));
   Subscription.findOne({
