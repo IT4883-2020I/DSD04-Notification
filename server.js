@@ -2,6 +2,7 @@ require('dotenv').config()
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const webpushHandler = require("./routes/webpush");
 
 const app = express();
 
@@ -22,6 +23,8 @@ mongoose.connect(process.env.mongoURI,
 // routes
 // app.use("/test", require('./routes/test'));
 app.use("/", require('./routes/notification'));
+app.post("/subscribe", webpushHandler.handlePushNotificationSubscription);
+app.post("/push_notification", webpushHandler.sendPushNotification);
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`App is running on port ${port}`));
