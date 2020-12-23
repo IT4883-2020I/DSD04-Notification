@@ -1,7 +1,6 @@
 const crypto = require("crypto");
 const webpush = require("web-push");
 const Subscription = require('../models/Subscription');
-const Notification = require('../models/Notification');
 
 const vapidKeys = {
   privateKey: "yRIfSrXJbEtRJusQpDr-jnnsAPL5sI59EgX2rXTSkN4",
@@ -75,10 +74,6 @@ sendPushNotification = async(req, res) => {
       try {
         clients.map( async(client) => {
           pushNotification(client, payload)
-          await new Notification({
-            subscription: client._id,
-            payload: payload
-          }).save()
         });
       } catch (error) {
         return res.json({
@@ -96,10 +91,6 @@ sendPushNotification = async(req, res) => {
       try {
         clients.map( async(client) => {
           pushNotification(client, payload)
-          await new Notification({
-            subscription: client._id,
-            payload: payload
-          }).save()
         });
       } catch (error) {
         return res.json({
@@ -127,49 +118,6 @@ const pushNotification = (client, payload) => {
   .catch(err => {
     throw err;
   });
-}
-
-
-const getNotifications = (req, res) => {
-  const { subscription, userID } = req.body;
-  console.log(req.body);
-  if (userID) {
-    Notification.find({userID: userID}, (err, notifications => {
-      if (err) return res.json({
-        code: 500,
-        message: `cannot get the notifications: ${err}`
-      })
-      return res.json({
-        code: 200,
-        message: "get notifications successfully",
-        notifications: notifications
-      })
-    }))
-  }else{
-    Subscription.findOne({ hash: createHash(JSON.stringify(subscription)) }, (err, sub) => {
-      if (err) return res.json({
-        code: 500,
-        message: `cannot get the notifications: ${err}`
-      })
-
-      if (!sub) return res.json({
-        code: 500,
-        message: 'not found the endpoint in db'
-      })
-
-      Notification.find({subscription: sub._id}, (err, notifications) => {
-        if (err) return res.json({
-          code: 500,
-          message: `cannot get the notifications: ${err}`
-        })
-        return res.json({
-          code: 200,
-          message: "get notifications successfully",
-          notifications: notifications
-        })
-      })
-    })
-  }
 }
 
 module.exports = { handlePushNotificationSubscription, sendPushNotification, getNotifications };
