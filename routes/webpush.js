@@ -56,58 +56,43 @@ handlePushNotificationSubscription = (req, res) => {
   })
 }
 
-sendPushNotification = async(req, res) => {
-  console.log("someone calling push notification request")
-  const { project_type, payload, userID } = req.body;
-  if (!project_type && !userID){
-    return res.json({
-      code: 500,
-      message: `not enough parameters: project_type and userID`
-    })
-  }
-  if (userID) {
-    await Subscription.find({ userID: userID }, async(err, clients) => {
-      if (!userID) return res.json({
-        code: 500,
-        message: "User hasn't registered to receive notification"
+sendPushNotification = async(project_type, payload, userID) => {
+    console.log("someone calling push notification request")
+    const { project_type, payload, userID } = req.body;
+    if (userID) {
+      await Subscription.find({ userID: userID }, async(err, clients) => {
+        try {
+          clients.map( async(client) => {
+            pushNotification(client, payload)
+            await new Notification({
+              subscription: client._id,
+              payload: payload
+            }).save()
+          });
+        } catch (error) {
+          console.log(err);
+          throw err;
+        }
       })
-      try {
-        clients.map( async(client) => {
-          pushNotification(client, payload)
-        });
-      } catch (error) {
-        return res.json({
-          code: 500,
-          message: `cannot push the notifications to clients: ${err}`
-        })
-      }
-    })
-  }else {
-    await Subscription.find({ project_type: project_type }, (err, clients) => {
-      if (err) return res.json({
-        code: 500,
-        message: `cannot push the notifications to clients: ${err}`
+    }else {
+      await Subscription.find({ project_type: project_type }, (err, clients) => {
+        try {
+          clients.map( async(client) => {
+            pushNotification(client, payload)
+            await new Notification({
+              subscription: client._id,
+              payload: payload
+            }).save()
+          });
+        } catch (error) {
+          console.log(err);
+          throw err;
+        }
+        
       })
-      try {
-        clients.map( async(client) => {
-          pushNotification(client, payload)
-        });
-      } catch (error) {
-        return res.json({
-          code: 500,
-          message: `cannot push the notifications to clients: ${err}`
-        })
-      }
-      
-    })
-  }
-  return res.status(202).json({
-    code: 202,
-    message: `Push notifications successfully ${userID ? `user: ${userID}`: `project_type: ${project_type}`}`
-  });
-  
+    }
 }
-
+  
 const pushNotification = (client, payload) => {
   webpush.sendNotification(
     client.subscription,
