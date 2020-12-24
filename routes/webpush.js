@@ -68,10 +68,6 @@ const sendPushNotification = async(project_type, payload, userID) => {
         try {
           clients.map( async(client) => {
             pushNotification(client, payload)
-            await new Notification({
-              subscription: client._id,
-              payload: payload
-            }).save()
           });
         } catch (error) {
           console.log(err);
@@ -83,10 +79,6 @@ const sendPushNotification = async(project_type, payload, userID) => {
         try {
           clients.map( async(client) => {
             pushNotification(client, payload)
-            await new Notification({
-              subscription: client._id,
-              payload: payload
-            }).save()
           });
         } catch (error) {
           console.log(err);
