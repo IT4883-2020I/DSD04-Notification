@@ -24,7 +24,6 @@ mongoose.connect(process.env.mongoURI,
 // app.use("/test", require('./routes/test'));
 app.use("/", require('./routes/notification'));
 app.post("/subscribe", webpushHandler.handlePushNotificationSubscription);
-app.post("/push-notification", webpushHandler.sendPushNotification);
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`App is running on port ${port}`));
