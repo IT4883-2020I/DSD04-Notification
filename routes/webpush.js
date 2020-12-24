@@ -45,7 +45,7 @@ const handlePushNotificationSubscription = (req, res) => {
         })
       newSub.save().then(result => {
         res.status(201).json({
-          code: 201,
+          code: 200,
           subscriptionId: subHash,
           message: "subcribed push notification successfully"
         })
@@ -63,14 +63,15 @@ const handlePushNotificationSubscription = (req, res) => {
 
 const sendPushNotification = async(project_type, payload, userID) => {
     console.log("someone calling push notification request")
+    console.log(`project_type: ${project_type} -- payload: ${payload} -- userID" ${userID}`)
     if (userID) {
       await Subscription.find({ userID: userID }, async(err, clients) => {
+        console.log(`clients: ${clients.length}`)
         try {
           clients.map( async(client) => {
             pushNotification(client, payload)
           });
         } catch (error) {
-          console.log(err);
           throw err;
         }
       })
@@ -90,6 +91,7 @@ const sendPushNotification = async(project_type, payload, userID) => {
 }
   
 const pushNotification = (client, payload) => {
+  console.log(client);
   webpush.sendNotification(
     client.subscription,
     JSON.stringify({
@@ -97,7 +99,8 @@ const pushNotification = (client, payload) => {
     })
   )
   .catch(err => {
-    throw err;
+    console.log(`Cannot push notification`);
+    console.log(err)
   });
 }
 

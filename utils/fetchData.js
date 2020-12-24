@@ -138,7 +138,6 @@ function getUserById(id, project_type, token) {
     axios(config)
     .then(function (response) {
       let datas = response.data.result;
-      console.log(`userID: ${id} ==== `, datas)
       resolve(datas);
     })
     .catch(function (error) {
