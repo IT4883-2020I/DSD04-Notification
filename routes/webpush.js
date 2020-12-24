@@ -58,16 +58,12 @@ const handlePushNotificationSubscription = (req, res) => {
 
 const sendPushNotification = async(project_type, payload, userID) => {
     console.log("someone calling push notification request")
-    const { project_type, payload, userID } = req.body;
+
     if (userID) {
       await Subscription.find({ userID: userID }, async(err, clients) => {
         try {
           clients.map( async(client) => {
             pushNotification(client, payload)
-            await new Notification({
-              subscription: client._id,
-              payload: payload
-            }).save()
           });
         } catch (error) {
           console.log(err);
@@ -79,10 +75,6 @@ const sendPushNotification = async(project_type, payload, userID) => {
         try {
           clients.map( async(client) => {
             pushNotification(client, payload)
-            await new Notification({
-              subscription: client._id,
-              payload: payload
-            }).save()
           });
         } catch (error) {
           console.log(err);

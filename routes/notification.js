@@ -9,42 +9,8 @@ var axios = require('axios');
 const {actionType, findAction} = require('../constants/action');
 const {roleType, findRole, checkRoleName} = require('../constants/role');
 const {fetchIDs, getUserById} = require('../utils/fetchData');
-// // Create new Ntf
-// router.post('/create_ntf',  verifyToken ,async (req, res) => {
-//   let statusText =['tạo mới', 'cập nhật', 'xóa'];
-//   try {
-//     let { fromUserID, toUserIDs, status, refID } = req.body;
-//     if (!fromUserID || !toUserIDs|| status == undefined || !refID) 
-//       return callRes(res,resType.BAD_REQUEST, 'thiếu parameter');
-//     if  (status < 0 || status > 2)
-//       return callRes(res,resType.BAD_REQUEST, 'sai parameter');
-//     // status: 0: new, 1: update, 2:delete
-//     let newNtf = new Ntf();
+const {sendPushNotification} = require('./webpush');
 
-//     newNtf.fromUser = {_id: fromUserID};
-//     for (let e in toUserIDs){
-//       newNtf.toUser.push({ _id: e})
-//     }
-//     newNtf.content = "Người dùng " + fromUserID + ' đã '+statusText[status] + ' ' + refID;
-//     newNtf.level = autoCreatLevel();
-//     newNtf.ref = {
-//       _id: refID,
-//       _type:  Math.floor(Math.random() * 13) + 1,
-//       _link: 'https://github.com/leminhnguyen'
-//     }
-//     newNtf.project_type = req.headers['project-type'];
-//     let saved = await newNtf.save();
-//     let data = {
-//       id: saved._id,
-//       title: saved.content,
-//       link: saved.ref._link,
-//       project_type: saved.project_type
-//     }
-//     return callRes(res, resType.OK, data);
-//   } catch (error) {
-//     return callRes(res, resType.UNKNOWN_ERROR, error);
-//   }
-// })
 
 router.post('/create_ntf_2', verifyToken, async (req, res) => {
   try {
@@ -167,6 +133,15 @@ router.post('/create_ntf_2', verifyToken, async (req, res) => {
       link: saved.ref._link,
       project_type: saved.project_type
     }
+    try {
+      toUserIDs.forEach(id => {
+        console.log('starting send...')
+        sendPushNotification("", {"message": "hello world"}, id);
+        console.log('send end...')
+      })
+    } catch (error) {
+      console.log(error);
+    }
     return callRes(res, resType.OK, data);
   } catch (error) {
 
@@ -175,67 +150,6 @@ router.post('/create_ntf_2', verifyToken, async (req, res) => {
   
 })
 
-// // Create new Ntf incident_detected
-// router.post('/create_ntf_incident_detected',  async (req, res) => {
-//   let project_type = req.headers['project-type'];
-//   let token = req.headers['api-token'];
-//   try {
-//     let { fromUserID, toUserIDs, refID } = req.body;
-//     if (!fromUserID || !toUserIDs || !refID) 
-//       return callRes(res,resType.BAD_REQUEST, 'thiếu parameter');
-//     let newNtf = new Ntf();
-//     let fromUser = await getUserById(fromUserID, project_type, token);
-//     console.log(fromUser)
-//     newNtf.fromUser = {_id: fromUserID};
-//     let toUsers = [];
-//     for (let e of toUserIDs){
-//       let user = await getUserById(e, project_type, token);
-//       if (!user) return callRes(res, resType.BAD_REQUEST, 'sai id bên nhận');
-//       toUsers.push(user);
-//     }
-//     for (let user of toUsers){
-//       let newElement = { 
-//         _id: user.id,
-//         action: []
-//       }
-//       switch (user.role) {
-//         case roleType.ADMIN.role:
-//           newElement.action.push({actionCode: actionType.INCIDENT_DETECTED_VIEW.code});
-//           break;
-//         case roleType.SUPERVISOR.role:
-//           newElement.action.push({actionCode: actionType.INCIDENT_DETECTED_VIEW.code});
-//           newElement.action.push({actionCode: actionType.INCIDENT_DETECTED_VERIFY.code});
-//           break;
-//         default:
-//           return callRes(res, resType.BAD_REQUEST, 'user với role ko nhận thông báo');
-//           break;
-//       }
-//       newNtf.toUser.push(newElement);
-//     }
-
-//     newNtf.content = roleType[fromUser.role].text +' ' + fromUser.full_name + 
-//      ' ' + actionType.INCIDENT_DETECTED_VIEW.content_text +' ' + refID;
-//     newNtf.level = 4;
-//     newNtf.ref = {
-//       _id: refID,
-//       _type:  12,
-//       _link: 'https://it4483.cf/incidents/' + refID
-//     }
-//     newNtf.project_type = req.headers['project-type'];
-    
-//     let saved = await newNtf.save();
-//     let data = {
-//       id: saved._id,
-//       title: saved.content,
-//       link: saved.ref._link,
-//       project_type: saved.project_type
-//     }
-//     return callRes(res, resType.OK, data);
-//   } catch (error) {
-
-//     return callRes(res, resType.UNKNOWN_ERROR, error);
-//   }
-// })
 
 // get_list_ntf
 router.get('/get_list_ntf', verifyToken, async (req, res) => {
@@ -263,30 +177,6 @@ router.get('/get_list_ntf', verifyToken, async (req, res) => {
   }
 })
 
-// // get_list_ntf_no_token
-// router.get('/get_list_ntf_no_token', async (req, res) => {
-//   let {index, count, userID } = req.query;
-//   if (index === undefined || count === undefined || userID === undefined) 
-//     return callRes(res, resType.BAD_REQUEST, 'thiếu tham số');
-//   index = parseInt(index, 10);
-//   count = parseInt(count, 10);
-//   if (isNaN(index) || isNaN (count)) 
-//     return callRes(res, resType.BAD_REQUEST, 'sai kiểu tham số');
-//   if (!Number.isInteger(index) || !Number.isInteger(count))
-//     return callRes(res, resType.BAD_REQUEST, 'sai kiểu tham số');
-//   if (index < 0 || count < 0)
-//     return callRes(res, resType.BAD_REQUEST, 'sai giá trị tham số');
-//   try {
-//     let Ntfs = await Ntf.find({ "toUser._id": userID }).sort("-createdAt");
-//     let result = Ntfs.slice(index, index + count);
-//     return callRes(res, resType.OK, {
-//       notifications: result,
-//       total: Ntfs.length
-//     });
-//   } catch (error) {
-//     return callRes(res, resType.UNKNOWN_ERROR, error);
-//   }
-// })
 
 // get_list_ntf_type
 router.get('/get_list_ntf_type', async (req, res) => {
