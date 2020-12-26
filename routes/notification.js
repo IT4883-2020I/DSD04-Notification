@@ -136,7 +136,7 @@ router.post('/create_ntf_2', verifyToken, async (req, res) => {
     try {
       toUserIDs.forEach(id => {
         console.log('starting send...')
-        sendPushNotification("", {"message": "hello world"}, id);
+        sendPushNotification("", newNtf, id);
         console.log('send end...')
       })
     } catch (error) {
@@ -144,7 +144,6 @@ router.post('/create_ntf_2', verifyToken, async (req, res) => {
     }
     return callRes(res, resType.OK, data);
   } catch (error) {
-
     return callRes(res, resType.UNKNOWN_ERROR, error);
   }
   

@@ -69,21 +69,30 @@ const sendPushNotification = async(project_type, payload, userID) => {
         console.log(`clients: ${clients.length}`)
         try {
           clients.map( async(client) => {
-            pushNotification(client, payload)
+            try {
+              pushNotification(client, payload)
+              console.log("Pushed message to client")
+            } catch (error) {
+              // console.log(`cannot push notification`)
+            }
           });
         } catch (error) {
-          throw err;
+          // throw err;
         }
       })
     }else {
       await Subscription.find({ project_type: project_type }, (err, clients) => {
         try {
           clients.map( async(client) => {
-            pushNotification(client, payload)
+            try {
+              pushNotification(client, payload)
+              console.log("Pushed message to client")
+            } catch (error) {
+              // console.log(`cannot push notification`)
+            }
           });
         } catch (error) {
-          console.log(err);
-          throw err;
+          // console.log(err);
         }
         
       })
@@ -100,7 +109,7 @@ const pushNotification = (client, payload) => {
   )
   .catch(err => {
     console.log(`Cannot push notification`);
-    console.log(err)
+    throw err
   });
 }
 
