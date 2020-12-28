@@ -109,7 +109,6 @@ const pushNotification = (client, payload) => {
   )
   .catch(err => {
     console.log(`Cannot push notification`);
-    throw err
   });
 }
 
