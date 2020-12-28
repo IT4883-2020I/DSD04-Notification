@@ -17,7 +17,7 @@ const createHash = (input) => {
 
 const handlePushNotificationSubscription = (req, res) => {
   console.log("someone calling subcribe request")
-  const projectTypes = ['DE_DIEU', 'CAY_TRONG', 'CHAY_RUNG', 'LUOI_DIEN']
+  const projectTypes = ['DE_DIEU', 'CAY_TRONG', 'CHAY_RUNG', 'LUOI_DIEN', 'ALL_PROJECT']
   const { subscription, project_type, userID } = req.body;
   if (!subscription) return res.json({
     "code": "500",
