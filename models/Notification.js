@@ -23,7 +23,7 @@ const NotificationSchema = new mongoose.Schema(
       },
       check: {
         type: Boolean, // đánh giá xem gửi thông báo có đúng không
-        default: true
+        default: false
       },
       action: [{ 
         actionCode: {
