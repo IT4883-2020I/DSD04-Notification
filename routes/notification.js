@@ -271,9 +271,11 @@ router.delete('/delete_ntf', verifyToken, async (req, res) => {
     if (!ntf) return callRes(res, resType.NOT_FOUND,'not found');
     let index = ntf.toUser.findIndex(e => e._id == userId);
     if (index < 0) return callRes(res, resType.BAD_REQUEST, 'user không trong danh sách nhận thông báo');
-    if (ntf.toUser[index].status == 1) return callRes(res,resType.BAD_REQUEST, 'hành động đã thực hiện');
-    ntf.toUser[index].isSeen = false;
-    ntf.toUser[index].status = 1;
+    // if (ntf.toUser[index].status == 1) return callRes(res,resType.BAD_REQUEST, 'hành động đã thực hiện');
+    // ntf.toUser[index].isSeen = false;
+    // ntf.toUser[index].status = 1;
+    ntf.toUser.splice(index, 1);
+    ntf.deletedByUser.push({_id: userId});
     await ntf.save();
     return callRes(res, resType.OK);
   } catch (error) {
@@ -290,9 +292,11 @@ router.delete('/unDelete_ntf', verifyToken, async (req, res) => {
     let ntf = await Ntf.findById(idNtf);
     if (!ntf) return callRes(res, resType.NOT_FOUND,'not found');
     let index = ntf.toUser.findIndex(e => e._id == userId);
-    if (index < 0) return callRes(res, resType.BAD_REQUEST, 'user không trong danh sách nhận thông báo');
-    if (ntf.toUser[index].status == 0) return callRes(res,resType.BAD_REQUEST, 'hành động đã thực hiện');
-    ntf.toUser[index].status = 0;
+    if (index >= 0) return callRes(res, resType.BAD_REQUEST, 'hành động không hợp lệ ');
+    let index1 = ntf.deletedByUser.findIndex(e => e._id == userId);
+    if (index1 < 0) return callRes(res, resType.BAD_REQUEST, 'user không trong danh sách nhận thông báo');
+    ntf.deletedByUser.splice(index1, 1);
+    ntf.toUser.push({_id: userId});
     await ntf.save();
     return callRes(res, resType.OK);
   } catch (error) {

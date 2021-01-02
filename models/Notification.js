@@ -78,7 +78,12 @@ const NotificationSchema = new mongoose.Schema(
     },
     project_type:{
       type: String,
-    }
+    },
+    deletedByUser: [{
+      _id: {
+        type: String
+      }
+    }]
   }
 
 )
