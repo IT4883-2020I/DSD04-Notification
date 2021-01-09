@@ -1,24 +1,22 @@
-# DSD04-Notification
+# DSD04-Notification IT4883-20201
 các chức năng về thông báo
 
 ### Config
-set your config on config/default.json
+set your config on /.env file
 ```
-{
-  "mongoURI": "your-mongo-uri"
-}
+mongoURI=your-mongo-uri
 ```
 
-### Installation
+### Installation 
 ```sh
 $ npm install
 ```
 ### Run
-#### dev
+#### On development environment
 ```sh
 $ npm run dev
 ```
-#### server
+#### On deployment environment
 ```sh
 $ npm run start
 ```
