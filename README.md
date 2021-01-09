@@ -21,5 +21,4 @@ $ npm run dev
 $ npm run start
 ```
 ### API
-#### #1
-#### #2
+please link API docs (postman): [link](https://documenter.getpostman.com/view/12799829/TVmLBJM8)
