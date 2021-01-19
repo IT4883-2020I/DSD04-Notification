@@ -4,8 +4,16 @@ các chức năng về thông báo
 ### Config
 set your config on /.env file
 ```
-mongoURI=your-mongo-uri
+mongoURI=your-mongo-uri 
 ```
+Ví dụ:
+```
+mongoURI=mongodb+srv://<user_name>:<user_password>@<cluster_link>/<db_name>?retryWrites=true&w=majority
+```
+<user_name>:duycv  
+<user_password>:I3jaob3UpdVcLVq3  
+<cluster_link>:cluster0.pfzrb.mongodb.net  
+<db_name>:DSD04-Notification  
 
 ### Check dịch vụ
 sau khi deploy lên heroku, heroku sẽ tự start server.
